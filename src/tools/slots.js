@@ -5,9 +5,7 @@ export default function checkPrize(arr, user) {
             let win = 1
             user.setMoney(user.getMoney() + win)
             user.setWinMoney(user.getWinMoney() + win) //выйгрыш раунда - одна прокрутка 
-
             user.setWinAllMoney(user.getWinAllMoney() + win)
-
             user.setWinArr({
                 'time': getTime(), 'winImg': key, 'winAmount': arr[key], 'winMoney': win
             })
@@ -79,7 +77,7 @@ let winRotate = (key) => {
         element.classList.add('rotated')
         setTimeout(() => {
             element.classList.remove('rotated')
-        }, 5000);
+        }, 4000);
     });
 }
 

@@ -42,6 +42,9 @@ const InfoBar = observer(() => {
 
 
     const startStopHandler = () => {
+        let arrW = JSON.parse(JSON.stringify(user.getWinArr()))
+        // console.log(arrW);
+
         user.setClearScores()
 
         setMyColor("#" + randcolor())
@@ -99,11 +102,12 @@ const InfoBar = observer(() => {
 
             <h2 style={{ color: myColor }}>Кручу-верчу, обмануть хочу!</h2>
             <div className='divApp'>
+                {/* 1000 900 1250 860 1100 */}
                 <RandomItem timer={1000} speed={2} ></RandomItem>
-                <RandomItem timer={900} speed={2}></RandomItem>
-                <RandomItem timer={1250} speed={2}></RandomItem>
-                <RandomItem timer={860} speed={2}></RandomItem>
+                <RandomItem timer={1050} speed={2}></RandomItem>
                 <RandomItem timer={1100} speed={2}></RandomItem>
+                <RandomItem timer={1150} speed={2}></RandomItem>
+                <RandomItem timer={1200} speed={2}></RandomItem>
             </div>
             <div className='myFlex btn'>
                 {user.getAutoRounds() ?
