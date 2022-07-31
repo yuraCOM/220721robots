@@ -49,12 +49,11 @@ const RandomItem = observer((props) => {
 
     }, [user.getStart()])
 
-
-
     return (
         <div className='num-block'  >
+            {/* {key = { Math.random() * Date.now() * Math.random() }} */}
             <img id={'win' + currentN} className={startAnim ? currentAnim : 'numInblockStart'}
-                src={'images/' + currentN + '.png'} alt="currentN" />
+                src={process.env.PUBLIC_URL + '/images/' + currentN + '.png'} alt="currentN" />
             {/* <p className={startAnim ? "numInblock numInblock-anim" : "numInblock"}>{currentN}</p> */}
             {/* <p className={startAnim ? "numInblock numInblock-anim" : "numInblock"}>{currentN}</p> */}
         </div>

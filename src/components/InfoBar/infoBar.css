@@ -2,6 +2,34 @@
   color: white;
   text-align: center;
 }
+
+.settings {
+  margin-top: 5px;
+  margin-right: 15px;
+  display: flex;
+  justify-content: flex-end;
+}
+.settings-btn {
+  background-color: #ffffff;
+  margin-left: 5px;
+  width: 30px;
+  height: 30px;
+  background-repeat: no-repeat;
+  border: 0;
+  outline: 0;
+  opacity: 0.8;
+  cursor: pointer;
+  /* transition: 0.3s; */
+}
+
+.sound-on {
+  background-image: url(/public/images/vol.svg);
+}
+
+.sound-off {
+  background-image: url(/public/images/mute.svg);
+}
+
 h3 {
   align-items: center;
 }
@@ -15,7 +43,7 @@ h3 {
 }
 
 .minImg {
-  width: 14%;
+  width: 5%;
 }
 
 input {
@@ -29,6 +57,12 @@ input {
 .info-bar > .btn button {
   padding: 10px;
   margin: 15px;
+}
+.ml-mr-5 {
+  margin: 0 5px;
+}
+.info-msg p {
+  margin: 0;
 }
 
 @keyframes rotation {

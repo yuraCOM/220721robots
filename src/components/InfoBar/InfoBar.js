@@ -1,3 +1,4 @@
+import { autorun, toJS } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import React, { useContext, useEffect, useState } from 'react'
 import { Context } from '../..';
@@ -6,17 +7,22 @@ import checkPrize from '../../tools/slots';
 import RandomItem from '../randomItem/RandomItem';
 import './infoBar.css'
 
+// const audioPush = new Audio(process.env.PUBLIC_URL + '/sounds/hand.mp3');
+// const audioRound = new Audio(process.env.PUBLIC_URL + '/sounds/tick.mp3');
+// const audioBid = new Audio(process.env.PUBLIC_URL + '/sounds/bid.mp3');
+// const audioWin01 = new Audio(process.env.PUBLIC_URL + '/sounds/win01.mp3');
+
 const InfoBar = observer(() => {
+
+
     const { user } = useContext(Context)
     const [value, setValue] = useState(0);
     const [myColor, setMyColor] = useState('white')
 
     useEffect(() => {
         if (user.getScores().length === 5) {
-            let x = user.getScores()
 
-            // x = [1, 1, 1, 1, 5]
-            const countItems = x.reduce((acc, item) => {
+            const countItems = user.getScores().reduce((acc, item) => {
                 acc[item] = acc[item] ? acc[item] + 1 : 1; // если элемент уже был, то прибавляем 1, если нет - устанавливаем 1
                 return acc;
             }, {});
@@ -24,30 +30,71 @@ const InfoBar = observer(() => {
             // обрабатываем ключи объекта
             // const result = Object.keys(countItems).filter((item) => countItems[item] > 1);
 
-            checkPrize(countItems, user)
+            if (user.getMoney() !== 0) {
+                checkPrize(countItems, user)
+
+                // if (user.getWinMoney() === 0) {
+                //     user.setWinMessage('Крути! Повезет в следующий раз!')
+                // }
+            }
             user.setStart(false)
+            if (user.sound) {
+                if (user.getWinMoney() === 0) {
+                    user.audioWinZero.play()
+                }
+                if (user.getWinMoney() < 0) {
+                    user.audioWin00.play()
+                }
+                if (user.getWinMoney() > 0 && user.getWinMoney() <= 2) {
+                    user.audioWin01.play()
+                }
+                if (user.getWinMoney() > 2) {
+                    user.audioWin02.play()
+                }
+            }
+
+
         }
     }, [user.getScores().length])
 
+    autorun(() => {
+        if (user.getScores().length === 5) {
+            user.audioRound.pause()
+            user.audioRound.currentTime = 0;
+        }
+
+    })
+
+    function settings() {
+        user.sound ? user.setSound(false) : user.setSound(true)
+    }
+
 
     function manyBid(event) {
+
+
         event.preventDefault();
-        // console.log(value);
-        let rounds = Number(user.getRounds()) + Number((value))
-        user.setRounds(rounds)
+        if (user.sound && value !== 0) {
+            user.audioBid.play()
+        }
         let money = Number(user.getMoney()) + Number(value)
         user.setMoney(money)
         setValue(0)
     }
 
-
     const startStopHandler = () => {
-        let arrW = JSON.parse(JSON.stringify(user.getWinArr()))
+        setMyColor(randcolor())
+        user.setClearScores()
+        user.setClearWinMessage()
+
+        if (user.getMoney() && user.sound) {
+            user.audioPush.play();
+            setTimeout(() => { user.audioRound.play() }, 750)
+        }
+
+        // let arrW = JSON.parse(JSON.stringify(user.getWinArr()))
         // console.log(arrW);
 
-        user.setClearScores()
-
-        setMyColor("#" + randcolor())
         if (user.getMoney() === 0) {
             alert('Нет денег')
         } else {
@@ -57,12 +104,14 @@ const InfoBar = observer(() => {
             if (user.getStart()) {
                 user.setStart(false)
                 user.setClearScores()
+
             } else {
                 if (!user.getStart()) {
                     user.setStart(true)
                     let rounds = user.getRounds()
-                    user.setRounds(rounds - 1)
+                    user.setRounds(rounds + 1)
                     user.setWinMoney(0)
+
                     // user.setDelWinArr()
                 }
             }
@@ -71,6 +120,8 @@ const InfoBar = observer(() => {
 
 
     const autoPlay = () => {
+        user.setClearWinMessage()
+        user.setWinMessage('Wait please...')
         setMyColor("#" + randcolor())
         if (user.getMoney() === 0) {
             alert('Нет денег')
@@ -80,12 +131,9 @@ const InfoBar = observer(() => {
             auto = setInterval(() => {
                 if (!user.getAutoRounds()) {
                     clearInterval(auto)
-                    console.log(user.getAutoRounds());
-
                 }
                 if (user.getMoney() === 0) {
                     clearInterval(auto)
-                    console.log('нет денег');
                     user.setAutoRounds(false)
                 }
                 else {
@@ -99,8 +147,21 @@ const InfoBar = observer(() => {
 
     return (
         <div className='info-bar'>
-
+            <div className='settings'>
+                <button className={user.sound ? 'settings-btn sound-on' : 'settings-btn sound-off'}
+                    onClick={() => settings()}
+                ></button>
+            </div>
             <h2 style={{ color: myColor }}>Кручу-верчу, обмануть хочу!</h2>
+            <form className='myFlex myFlexInline' onSubmit={manyBid} >
+                <p>Cтавка $</p>
+                <input type={'number'} value={value} min={0}
+                    onFocus={(event) => (event.target.value = "")}
+                    onChange={(event) => {
+                        setValue(event.target.value)
+                    }}></input>
+                <button type="submit" >Ставка</button>
+            </form>
             <div className='divApp'>
                 {/* 1000 900 1250 860 1100 */}
                 <RandomItem timer={1000} speed={2} ></RandomItem>
@@ -109,6 +170,14 @@ const InfoBar = observer(() => {
                 <RandomItem timer={1150} speed={2}></RandomItem>
                 <RandomItem timer={1200} speed={2}></RandomItem>
             </div>
+            <div className='info-msg' style={{ color: myColor, height: '60px' }}>
+                {user.getWinMessage().map(item => {
+                    return (
+                        <p key={Math.random() * Date.now() * Math.random()}>{item}
+                        </p>)
+                })}
+            </div>
+
             <div className='myFlex btn'>
                 {user.getAutoRounds() ?
                     <div className=''>
@@ -131,42 +200,29 @@ const InfoBar = observer(() => {
                 }
             </div>
 
-
             {/* <div className='myFlex'>
                 <p>Старт: {user.getStart() ? 'True' : "False"}</p>
                 <p>WinArr: {user.getScores().join()}</p>
             </div> */}
 
-            <form className='myFlex myFlexInline' onSubmit={manyBid} >
-                <p>Ваша ставка $</p>
-                <input type={'number'} value={value}
-                    onFocus={(event) => (event.target.value = "")}
-                    onChange={(event) => {
-                        setValue(event.target.value)
-                    }}></input>
-                <button type="submit">Ставка</button>
-            </form>
-
-
             <div className='myFlex'>
-                <p>Money $: {user.getMoney()}</p>
-                {/* <p>Раунды: {user.getRounds()}</p> */}
-                <p>Выйгрыш текущ.раунд $: {user.getWinMoney()}</p>
-                <p>Выйгрыш за игру $: {user.getWinAllMoney()}</p>
-
+                <p className='ml-mr-5'>Money $: {user.getMoney()}</p>
+                <p className='ml-mr-5'>Раунды: {user.getRounds()}</p>
+                <p className='ml-mr-5'>Текущ.раунд $: {user.getWinMoney()}</p>
+                <p className='ml-mr-5'>За игру $: {user.getWinAllMoney()}</p>
             </div>
+
             <div>
                 {user.getWinArr().map(item => {
                     return (
-                        <div key={randcolor()} className='myFlexCenter'>
-                            <p>{item["time"]}</p>
-                            <img className={'minImg'} src={'images/' + item['winImg'] + '.png'} alt="currentN" /> * {item['winAmount']} = {item['winMoney']}$
+                        <div key={Math.random() * Date.now() * Math.random()} className='myFlexCenter'>
+                            <p>#{item["round"]} {item["time"]}</p>
+                            <img className={'minImg'} src={process.env.PUBLIC_URL + '/images/' + item['winImg'] + '.png'} alt="currentN" /> * {item['winAmount']} = {item['winMoney']}$
                         </div>
                     )
                 })}
             </div>
         </div >
-
     )
 })
 

@@ -1,78 +1,81 @@
 
 export default function checkPrize(arr, user) {
+
+    //............test
+    // arr = {
+    //     '2': 4,
+    // }
+
     for (let key in arr) {
+
+        // 13 -подкова
         if (Number(key) === 13 && arr[key] === 1) {
             let win = 1
-            user.setMoney(user.getMoney() + win)
-            user.setWinMoney(user.getWinMoney() + win) //выйгрыш раунда - одна прокрутка 
-            user.setWinAllMoney(user.getWinAllMoney() + win)
-            user.setWinArr({
-                'time': getTime(), 'winImg': key, 'winAmount': arr[key], 'winMoney': win
-            })
-            winRotate(key)
+            let msg = `Подкова на счастье!!! +${win}$`
+            setWin(win, msg, user, arr, key, winRotate)
         }
 
+        // 10 - череп и кости
+        if (Number(key) === 10 && arr[key] === 1) {
+            let win = -1
+            let msg = `Череп и кости :( минус ${win}$`
+            setWin(win, msg, user, arr, key, winRotate)
+        }
+
+        // просто два одинаковых
         if (arr[key] === 2) {
             let win
+            let msg
 
             if (Number(key) === 17) {
+                // titty
                 win = 5
-                console.log('Сиськи');
+                msg = `Одна пара titty хорошо, а две пары titty лучше :))) +${win}$`
+            }
+
+            else if (Number(key) === 9) {
+                //9 -сердце
+                win = 4
+                msg = `От сердца с любовью! :))) +${win}$`
             }
             else {
                 win = 2
+                msg = `Просто два одинаковых!!! +${win}$`
             }
 
-            user.setMoney(user.getMoney() + win)
-            user.setWinMoney(user.getWinMoney() + win) //выйгрыш раунда - одна прокрутка 
-
-            user.setWinAllMoney(user.getWinAllMoney() + win)
-
-            user.setWinArr({
-                'time': getTime(), 'winImg': key, 'winAmount': arr[key], 'winMoney': win
-            })
-            winRotate(key)
+            setWin(win, msg, user, arr, key, winRotate)
 
         }
+
         if (arr[key] === 3) {
             let win = 9
-            user.setMoney(user.getMoney() + win)
-            user.setWinMoney(user.getWinMoney() + win)
-            user.setWinAllMoney(user.getWinAllMoney() + win) // общий выйгрыш за все раунды
-
-            user.setWinArr({
-                'time': getTime(), 'winImg': key, 'winAmount': arr[key], 'winMoney': win
-            })
-            winRotate(key)
+            let msg = `ТРИ одинаковых!!! +${win}$`
+            setWin(win, msg, user, arr, key, winRotate)
         }
 
         if (arr[key] === 4) {
-            let win = 5000
-            user.setMoney(user.getMoney() + win)
-            user.setWinMoney(user.getWinMoney() + win)
-            user.setWinAllMoney(user.getWinAllMoney() + win) // общий выйгрыш за все раунды
-
-            user.setWinArr({
-                'time': getTime(), 'winImg': key, 'winAmount': arr[key], 'winMoney': win
-            })
-            winRotate(key)
+            let win = 50000
+            let msg = `МИНИ ДЖЕК-ПОТ !!! +${win}$`
+            setWin(win, msg, user, arr, key, winRotate)
         }
 
         if (arr[key] === 5) {
-            let win = 10000
-            user.setMoney(user.getMoney() + win)
-            user.setWinMoney(user.getWinMoney() + win)
-            user.setWinAllMoney(user.getWinAllMoney() + win) // общий выйгрыш за все раунды
-            user.setWinArr({
-                'time': getTime(), 'winImg': key, 'winAmount': arr[key], 'winMoney': win
-            })
-            winRotate(key)
+            let win = 100000
+            let msg = `ВЫ СОРВАЛИ ДЖЕК-ПОТ:))) +${win}$`
+            setWin(win, msg, user, arr, key, winRotate)
         }
     }
+    if (user.getWinMoney() === 0) {
+        user.setClearWinMessage()
+        user.setWinMessage('Крути!')
+        user.setWinMessage('Повезет в следующий раз!')
+    }
+
 }
 
 let winRotate = (key) => {
     let winImg = document.querySelectorAll('#win' + key)
+    // console.log(winImg);
     winImg.forEach(element => {
         element.classList.add('rotated')
         setTimeout(() => {
@@ -83,9 +86,24 @@ let winRotate = (key) => {
 
 function getTime() {
     let dateNow = new Date();
+    // let optionsN = {
+    //     year: 'numeric', month: 'short', day: 'numeric', second: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false
+    // };
     let optionsN = {
-        year: 'numeric', month: 'short', day: 'numeric', second: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false
+        second: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false
     };
     dateNow = dateNow.toLocaleString('ru-US', optionsN)
     return dateNow
+}
+
+function setWin(win, msg, user, arr, key, winRotate) {
+    user.setMoney(user.getMoney() + win)
+    user.setWinMoney(user.getWinMoney() + win)
+    user.setWinAllMoney(user.getWinAllMoney() + win) // общий выйгрыш за все раунды
+    user.setWinArr({
+        'round': user.getRounds(), 'time': getTime(), 'winImg': key, 'winAmount': arr[key], 'winMoney': win
+    })
+    user.setWinMessage(msg)
+
+    winRotate(key)
 }
