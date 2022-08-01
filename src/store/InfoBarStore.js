@@ -1,4 +1,4 @@
-import { makeAutoObservable, toJS, when, autorun } from 'mobx'
+import { makeAutoObservable, } from 'mobx'
 
 export default class InfoBarStore {
     audioPush = new Audio(process.env.PUBLIC_URL + '/sounds/hand.mp3');
