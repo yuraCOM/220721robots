@@ -6,7 +6,7 @@
   color: white;
   font-size: 60px;
   font-weight: bold;
-  /* border: 2px solid wheat; */
+  border: 1px solid wheat;
   overflow: hidden;
   width: 20%;
 }

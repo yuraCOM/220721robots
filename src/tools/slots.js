@@ -3,7 +3,7 @@ export default function checkPrize(arr, user) {
 
     //............test
     // arr = {
-    //     '2': 4,
+    //     '17': 2,
     // }
 
     for (let key in arr) {
@@ -11,7 +11,7 @@ export default function checkPrize(arr, user) {
         // 13 -подкова
         if (Number(key) === 13 && arr[key] === 1) {
             let win = 1
-            let msg = `Подкова на счастье!!! +${win}$`
+            let msg = `Horseshoe for good luck !!! +${win}$`
             setWin(win, msg, user, arr, key, winRotate)
         }
 
@@ -29,8 +29,8 @@ export default function checkPrize(arr, user) {
 
             if (Number(key) === 17) {
                 // titty
-                win = 5
-                msg = `Одна пара titty хорошо, а две пары titty лучше :))) +${win}$`
+                win = 6
+                msg = `One pair of TiTTYs is good, but two pairs of TiTTYs are better :))) +${win}$`
             }
 
             else if (Number(key) === 9) {
@@ -40,17 +40,28 @@ export default function checkPrize(arr, user) {
             }
             else {
                 win = 2
-                msg = `Просто два одинаковых!!! +${win}$`
+                msg = `Just a combo !!! +${win}$`
             }
 
             setWin(win, msg, user, arr, key, winRotate)
-
         }
 
+        // arr[key] === 3 ------------------------------------
         if (arr[key] === 3) {
-            let win = 9
-            let msg = `ТРИ одинаковых!!! +${win}$`
-            setWin(win, msg, user, arr, key, winRotate)
+            let win
+            let msg
+
+            if (Number(key) === 17) {
+                // titty
+                win = 15
+                msg = `Много TiTTY не бывает :))) +${win}$`
+                setWin(win, msg, user, arr, key, winRotate)
+            }
+            else {
+                win = 9
+                msg = `ТРИ одинаковых!!! +${win}$`
+                setWin(win, msg, user, arr, key, winRotate)
+            }
         }
 
         if (arr[key] === 4) {
@@ -67,8 +78,8 @@ export default function checkPrize(arr, user) {
     }
     if (user.getWinMoney() === 0) {
         user.setClearWinMessage()
-        user.setWinMessage('Крути!')
-        user.setWinMessage('Повезет в следующий раз!')
+        user.setWinMessage('Spin !!!')
+        user.setWinMessage('Good luck next time !!!')
     }
 
 }
@@ -106,4 +117,5 @@ function setWin(win, msg, user, arr, key, winRotate) {
     user.setWinMessage(msg)
 
     winRotate(key)
+    user.setClearScores()
 }

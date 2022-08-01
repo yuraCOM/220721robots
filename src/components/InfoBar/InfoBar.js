@@ -32,12 +32,10 @@ const InfoBar = observer(() => {
 
             if (user.getMoney() !== 0) {
                 checkPrize(countItems, user)
-
-                // if (user.getWinMoney() === 0) {
-                //     user.setWinMessage('Крути! Повезет в следующий раз!')
-                // }
             }
+
             user.setStart(false)
+
             if (user.sound) {
                 if (user.getWinMoney() === 0) {
                     user.audioWinZero.play()
@@ -69,17 +67,18 @@ const InfoBar = observer(() => {
         user.sound ? user.setSound(false) : user.setSound(true)
     }
 
-
     function manyBid(event) {
-
-
         event.preventDefault();
         if (user.sound && value !== 0) {
             user.audioBid.play()
         }
-        let money = Number(user.getMoney()) + Number(value)
-        user.setMoney(money)
-        setValue(0)
+        if (value === 0) {
+            bidSignal()
+        } else {
+            let money = Number(user.getMoney()) + Number(value)
+            user.setMoney(money)
+            setValue(0)
+        }
     }
 
     const startStopHandler = () => {
@@ -96,7 +95,7 @@ const InfoBar = observer(() => {
         // console.log(arrW);
 
         if (user.getMoney() === 0) {
-            alert('Нет денег')
+            bidSignal()
         } else {
             let money = Number(user.getMoney()) - 1
             user.setMoney(money)
@@ -124,7 +123,7 @@ const InfoBar = observer(() => {
         user.setWinMessage('Wait please...')
         setMyColor("#" + randcolor())
         if (user.getMoney() === 0) {
-            alert('Нет денег')
+            bidSignal()
         } else {
             user.setAutoRounds(true)
             let auto
@@ -144,31 +143,42 @@ const InfoBar = observer(() => {
     }
 
     const stopAuto = () => user.setAutoRounds(false)
+    const bidSignal = () => alert('Ставка 0. Сделайте ставку!!!')
+    const startTime = [1000, 1050, 1100, 1150, 1200]
 
     return (
         <div className='info-bar'>
-            <div className='settings'>
-                <button className={user.sound ? 'settings-btn sound-on' : 'settings-btn sound-off'}
-                    onClick={() => settings()}
-                ></button>
+
+            <h3 style={{ color: myColor, margin: "5px" }}>I twist and turn, I want to fool you!</h3>
+            <div className='myFlex'>
+                <form className='myFlex myFlexInline' onSubmit={manyBid} >
+                    <p>Cтавка $</p>
+                    <input type={'number'} value={value} min={0}
+                        onFocus={(event) => (event.target.value = "")}
+                        onChange={(event) => {
+                            setValue(event.target.value)
+                        }}></input>
+                    <button type="submit" >Ставка</button>
+                </form>
+                <div className='settings'>
+                    <button className={user.sound ? 'settings-btn sound-on' : 'settings-btn sound-off'}
+                        onClick={() => settings()}
+                    ></button>
+                </div>
+
+
             </div>
-            <h2 style={{ color: myColor }}>Кручу-верчу, обмануть хочу!</h2>
-            <form className='myFlex myFlexInline' onSubmit={manyBid} >
-                <p>Cтавка $</p>
-                <input type={'number'} value={value} min={0}
-                    onFocus={(event) => (event.target.value = "")}
-                    onChange={(event) => {
-                        setValue(event.target.value)
-                    }}></input>
-                <button type="submit" >Ставка</button>
-            </form>
+
             <div className='divApp'>
-                {/* 1000 900 1250 860 1100 */}
-                <RandomItem timer={1000} speed={2} ></RandomItem>
-                <RandomItem timer={1050} speed={2}></RandomItem>
-                <RandomItem timer={1100} speed={2}></RandomItem>
-                <RandomItem timer={1150} speed={2}></RandomItem>
-                <RandomItem timer={1200} speed={2}></RandomItem>
+                {startTime.map((item, index) => {
+                    return <RandomItem key={index} timer={item} speed={2} color={myColor} ></RandomItem>
+                })}
+
+                {/* <RandomItem timer={1000} speed={2} color={myColor} ></RandomItem>
+                <RandomItem timer={1050} speed={2} color={myColor}></RandomItem>
+                <RandomItem timer={1100} speed={2} color={myColor}></RandomItem>
+                <RandomItem timer={1150} speed={2} color={myColor}></RandomItem>
+                <RandomItem timer={1200} speed={2} color={myColor}></RandomItem> */}
             </div>
             <div className='info-msg' style={{ color: myColor, height: '60px' }}>
                 {user.getWinMessage().map(item => {
@@ -185,6 +195,7 @@ const InfoBar = observer(() => {
                             onClick={() => stopAuto()}>
                             {"STOP AUTO"}
                         </button>
+
                     </div>
                     :
                     <div className=''>
@@ -198,6 +209,7 @@ const InfoBar = observer(() => {
                         </button>
                     </div>
                 }
+
             </div>
 
             {/* <div className='myFlex'>
@@ -207,20 +219,27 @@ const InfoBar = observer(() => {
 
             <div className='myFlex'>
                 <p className='ml-mr-5'>Money $: {user.getMoney()}</p>
-                <p className='ml-mr-5'>Раунды: {user.getRounds()}</p>
-                <p className='ml-mr-5'>Текущ.раунд $: {user.getWinMoney()}</p>
-                <p className='ml-mr-5'>За игру $: {user.getWinAllMoney()}</p>
+                <p className='ml-mr-5'>Now win $: {user.getWinMoney()}</p>
             </div>
 
-            <div>
-                {user.getWinArr().map(item => {
-                    return (
-                        <div key={Math.random() * Date.now() * Math.random()} className='myFlexCenter'>
-                            <p>#{item["round"]} {item["time"]}</p>
-                            <img className={'minImg'} src={process.env.PUBLIC_URL + '/images/' + item['winImg'] + '.png'} alt="currentN" /> * {item['winAmount']} = {item['winMoney']}$
-                        </div>
-                    )
-                })}
+            <div className='winArrS'>
+                <div>
+                    {user.getWinArr().length === 0 ? <h4>Winning combos...</h4> : user.getWinArr().map(item => {
+                        return (
+                            <div key={Math.random() * Date.now() * Math.random()} className='myFlexCenter'>
+                                <p style={{ margin: 0 }}>#{item["round"]} {item["time"]}</p>
+                                <img className={'minImg'} src={process.env.PUBLIC_URL + '/images/' + item['winImg'] + '.png'} alt="currentN" /> * {item['winAmount']} = {item['winMoney']}$
+                            </div>
+                        )
+                    })}
+                </div>
+
+                <div>
+                    <p className='ml-mr-5'>Rounds: {user.getRounds()}</p>
+                    <p className='ml-mr-5'>All Win $: {user.getWinAllMoney()}</p>
+                </div>
+
+
             </div>
         </div >
     )

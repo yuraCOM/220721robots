@@ -50,7 +50,7 @@ const RandomItem = observer((props) => {
     }, [user.getStart()])
 
     return (
-        <div className='num-block'  >
+        <div className='num-block' style={{ borderColor: props.color }}  >
             {/* {key = { Math.random() * Date.now() * Math.random() }} */}
             <img id={'win' + currentN} className={startAnim ? currentAnim : 'numInblockStart'}
                 src={process.env.PUBLIC_URL + '/images/' + currentN + '.png'} alt="currentN" />
