@@ -29,10 +29,21 @@ const InfoBar = observer(() => {
 
             // обрабатываем ключи объекта
             // const result = Object.keys(countItems).filter((item) => countItems[item] > 1);
+            if (user.getMoney() < 0) {
+                alert('Сделайте ставку')
+            }
 
-            if (user.getMoney() !== 0) {
+            // if (user.getMoney() !== 0) {
+            //     console.log(user.getRounds());
+            //     checkPrize(countItems, user)
+            // }
+
+            if (user.getRounds() !== 0) {
                 checkPrize(countItems, user)
             }
+
+
+
 
             user.setStart(false)
 
@@ -165,8 +176,6 @@ const InfoBar = observer(() => {
                         onClick={() => settings()}
                     ></button>
                 </div>
-
-
             </div>
 
             <div className='divApp'>
@@ -174,11 +183,6 @@ const InfoBar = observer(() => {
                     return <RandomItem key={index} timer={item} speed={2} color={myColor} ></RandomItem>
                 })}
 
-                {/* <RandomItem timer={1000} speed={2} color={myColor} ></RandomItem>
-                <RandomItem timer={1050} speed={2} color={myColor}></RandomItem>
-                <RandomItem timer={1100} speed={2} color={myColor}></RandomItem>
-                <RandomItem timer={1150} speed={2} color={myColor}></RandomItem>
-                <RandomItem timer={1200} speed={2} color={myColor}></RandomItem> */}
             </div>
             <div className='info-msg' style={{ color: myColor, height: '60px' }}>
                 {user.getWinMessage().map(item => {
@@ -211,11 +215,6 @@ const InfoBar = observer(() => {
                 }
 
             </div>
-
-            {/* <div className='myFlex'>
-                <p>Старт: {user.getStart() ? 'True' : "False"}</p>
-                <p>WinArr: {user.getScores().join()}</p>
-            </div> */}
 
             <div className='myFlex'>
                 <p className='ml-mr-5'>Money $: {user.getMoney()}</p>
